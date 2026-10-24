@@ -1,0 +1,222 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title>CAE Platform & FEA Meshing | Liwen Fan</title>
+
+    <meta name="author" content="Liwen Fan">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css">
+
+  </head>
+
+  <body>
+    <!-- 图片都在 images/projects/cae/，同名替换即可 -->
+    <div class="pp">
+
+      <p class="pp-back"><a href="../index.html">&larr; Back to home</a></p>
+
+      <!-- ============ 标题 ============ -->
+      <header class="pp-hero">
+        <h1 class="pp-title">Automated CAE Platform and FEA Meshing</h1>
+        <p class="pp-authors"><strong>Liwen Fan</strong></p>
+        <p class="pp-affil">
+          Research Assistant, AI Engineering Lab, Hohai University, partnered with PowerChina &middot; Jun. 2024 &ndash; Oct. 2024
+          <br>
+          CAE Engineering Intern, PowerChina &middot; Feb. 2025 &ndash; Jun. 2025
+        </p>
+        <p class="pp-links">
+          <a href="#patents">3 Granted Patents</a>
+        </p>
+      </header>
+
+      <!-- ============ 目录 ============ -->
+      <ul class="pp-nav">
+        <li><a href="#dam">Is the dam safe?</a></li>
+        <li><a href="#problem">Why irregular meshes fail</a></li>
+        <li><a href="#algorithm">Stratified mesh projection</a></li>
+        <li><a href="#platform">From algorithm to platform</a></li>
+        <li><a href="#patents">Patents</a></li>
+      </ul>
+
+      <!-- ============ 一句话总结 ============ -->
+      <div class="pp-thesis">
+        <p>Hydropower dams are built on <em>layered, irregular terrain</em> &mdash; and generic meshing tools produce meshes that neither fit the layers nor stay small.</p>
+        <p><span class="pp-key">The key idea?</span> Project a clean 2D parent mesh into vertically stratified 3D layers, so the mesh follows the geology &mdash; then package the algorithm into a Rhino plugin and an automated CAE platform used on real projects.</p>
+      </div>
+
+      <figure class="pp-figure">
+        <img src="../images/projects/cae/dam-model.png" alt="Layered 3D geological model of a dam site" style="max-width:520px">
+        <figcaption>Layered 3D model of a dam site, with each material zone meshed separately</figcaption>
+      </figure>
+
+      <hr class="pp-sep">
+
+      <!-- ============ 1. Dam ============ -->
+      <section id="dam" class="pp-section">
+        <h2 class="pp-section-title">Is the dam safe?</h2>
+        <p class="pp-question">Phase 1 &mdash; validating a dam design under every load case.</p>
+        <p>
+          The first task was a full-process numerical simulation of a dam design. I combined field-standard blueprints,
+          material properties, and interface contacts into a programmable <strong>Rhino&ndash;FLAC3D</strong> environment,
+          then ran iterative FEA under three load cases, tracking peak stress, deformation, and factor of safety at every
+          loading increment.
+        </p>
+        <div class="pp-result-row">
+          <span class="pp-item"><span class="pp-k">Normal</span><span class="pp-v">steady water pressure + self-weight</span></span>
+          <span class="pp-item"><span class="pp-k">Flood</span><span class="pp-v">extreme hydrostatic &amp; hydrodynamic</span></span>
+          <span class="pp-item"><span class="pp-k">Seismic</span><span class="pp-v">dynamic response</span></span>
+        </div>
+        <div class="pp-grid">
+          <figure class="pp-figure">
+            <img src="../images/projects/cae/fea-iteration.gif" alt="Iterative FEA calculation" loading="lazy">
+            <figcaption>Iterative calculation across loading increments</figcaption>
+          </figure>
+          <figure class="pp-figure">
+            <img src="../images/projects/cae/fea-mesh.png" alt="FEA mesh of the dam foundation" loading="lazy">
+            <figcaption>Meshed foundation and core-wall region</figcaption>
+          </figure>
+        </div>
+        <p>
+          All responses stayed within design thresholds. The result was a <strong>reliability assessment report</strong>
+          confirming the safety margins of the dam&rsquo;s core wall, used as a reference for the final design audit.
+        </p>
+      </section>
+
+      <hr class="pp-sep">
+
+      <!-- ============ 2. Problem ============ -->
+      <section id="problem" class="pp-section">
+        <h2 class="pp-section-title">Why irregular meshes fail</h2>
+        <p class="pp-question">What goes wrong when generic tools mesh layered geology?</p>
+        <ol>
+          <li><strong>Generation errors</strong> that need costly manual correction.</li>
+          <li><strong>Poor conformity</strong>: elements ignore layer boundaries, so the mesh doesn&rsquo;t match the real stress distribution.</li>
+          <li><strong>Too many nodes</strong>, which slows every iteration and demands node filtering.</li>
+        </ol>
+        <figure class="pp-figure">
+          <img src="../images/projects/cae/irregular-mesh.png" alt="An irregular triangulated surface mesh" loading="lazy" style="max-width:420px">
+          <figcaption>Irregular triangulation that ignores the stratified structure</figcaption>
+        </figure>
+      </section>
+
+      <hr class="pp-sep">
+
+      <!-- ============ 3. Algorithm ============ -->
+      <section id="algorithm" class="pp-section">
+        <h2 class="pp-section-title">Stratified mesh projection</h2>
+        <p class="pp-question">Phase 2 &mdash; how do we make the mesh follow the layers?</p>
+        <p>
+          I developed a <strong>vertically-stratified mesh projection algorithm</strong> in Python: abstract each layer&rsquo;s
+          geometry, align the nodes between layers (same number, same order), then project a 2D parent mesh down through
+          the layers to build the 3D mesh.
+        </p>
+        <div class="pp-grid-3">
+          <figure class="pp-figure">
+            <img src="../images/projects/cae/algo-1.png" alt="Step 1: geometric abstraction" loading="lazy">
+            <figcaption>1. Abstract the layer geometry</figcaption>
+          </figure>
+          <figure class="pp-figure">
+            <img src="../images/projects/cae/algo-2.png" alt="Step 2: node alignment" loading="lazy">
+            <figcaption>2. Align nodes between layers</figcaption>
+          </figure>
+          <figure class="pp-figure">
+            <img src="../images/projects/cae/algo-3.png" alt="Step 3: projection into 3D" loading="lazy">
+            <figcaption>3. Project into 3D layers</figcaption>
+          </figure>
+        </div>
+        <p>
+          Two ingredients make the node alignment work. <strong>Douglas&ndash;Peucker smoothing</strong> removes redundant
+          collinear points and controls the number of control points on each boundary curve, and
+          <strong>mean value shape function interpolation</strong> matches nodes between arbitrary polygons.
+        </p>
+        <div class="pp-grid">
+          <figure class="pp-figure">
+            <img src="../images/projects/cae/mesh-side.png" alt="Side mesh following layer boundaries" loading="lazy">
+            <figcaption>Side mesh conforming to the layer boundary</figcaption>
+          </figure>
+          <figure class="pp-figure">
+            <img src="../images/projects/cae/mesh-result.png" alt="Successful stratified mesh" loading="lazy">
+            <figcaption>Final stratified mesh</figcaption>
+          </figure>
+        </div>
+        <ul class="pp-result-list">
+          <li><span class="pp-k">Node count</span><span class="pp-v">100k &rarr; 60k (~40% fewer)</span></li>
+          <li><span class="pp-k">Fidelity</span><span class="pp-v">mesh fits stratified features</span></li>
+          <li><span class="pp-k">Delivery</span><span class="pp-v">Python &rarr; Rhino plugin</span></li>
+          <li><span class="pp-k">Intellectual property</span><span class="pp-v">3 granted invention patents</span></li>
+        </ul>
+      </section>
+
+      <hr class="pp-sep">
+
+      <!-- ============ 4. Platform ============ -->
+      <section id="platform" class="pp-section">
+        <h2 class="pp-section-title">From algorithm to platform</h2>
+        <p class="pp-question">Phase 3 &mdash; can the method support real design iterations?</p>
+        <p>
+          At PowerChina I extended the research into a tailored CAE platform covering site selection, 3D modeling, FEA,
+          and reliability checks. I owned two modules:
+        </p>
+        <ul>
+          <li><strong>Integrated meshing module</strong>: starting from terrain data, it captures the structure contour with a convex-hull algorithm plus the Phase 2 algorithm, and generates the 3D meshed model.</li>
+          <li><strong>Automated filter-layer assessment</strong>: fits non-linear curves to raw material-grading data and computes the key design parameters from them.</li>
+        </ul>
+        <div class="pp-grid">
+          <figure class="pp-figure">
+            <img src="../images/projects/cae/terrain.png" alt="Terrain elevation data" loading="lazy">
+            <figcaption>1. Terrain data</figcaption>
+          </figure>
+          <figure class="pp-figure">
+            <img src="../images/projects/cae/contour-detect.png" alt="Detected structure contour" loading="lazy">
+            <figcaption>2. Detect the structure contour</figcaption>
+          </figure>
+          <figure class="pp-figure">
+            <img src="../images/projects/cae/zones.png" alt="Zoned site with the dam axis" loading="lazy">
+            <figcaption>3. Zone the site along the dam axis</figcaption>
+          </figure>
+          <figure class="pp-figure">
+            <img src="../images/projects/cae/meshed-model.png" alt="Generated 3D meshed model" loading="lazy">
+            <figcaption>4. Generated 3D meshed model</figcaption>
+          </figure>
+        </div>
+        <figure class="pp-figure">
+          <img src="../images/projects/cae/filter-gui.png" alt="Filter-layer assessment tool" loading="lazy">
+          <figcaption>Filter-layer assessment tool: grading curves fitted from raw data</figcaption>
+        </figure>
+        <p>
+          Together these closed the loop between design and validation: engineers could adjust aggregate grading within
+          safety limits and immediately see the stability feedback. The platform was applied on
+          <strong>2 active national projects</strong>, speeding up iterations and reducing input errors.
+        </p>
+      </section>
+
+      <hr class="pp-sep">
+
+      <!-- ============ 5. Patents ============ -->
+      <section id="patents" class="pp-section">
+        <h2 class="pp-section-title">Patents</h2>
+        <p class="pp-question">The meshing work led to three granted invention patents.</p>
+        <ul class="patent-list">
+          <li>
+            <strong>A Method for Douglas Smoothing of Closed Curves by Removing Redundant Collinear Points</strong>
+            <br>
+            <em>CN Invention Patent (Granted), ZL202411371990.X; Publication No. CN119180181B <strong>(2nd inventor)</strong></em>
+          </li>
+          <li>
+            <strong>A Method for Optimizing Curve Douglas Simplification by Controlling Control Point Number</strong>
+            <br>
+            <em>CN Invention Patent (Granted), ZL202411372526.2; Publication No. CN119337663B <strong>(2nd inventor)</strong></em>
+          </li>
+          <li>
+            <strong>A Multi-layer Mesh Generation Method for Arbitrary Polygon Point Matching Based on Mean Value Shape Function Interpolation Method</strong>
+            <br>
+            <em>CN Invention Patent (Granted), ZL202411792500.3; Publication No. CN119720656B <strong>(co-inventor)</strong></em>
+          </li>
+        </ul>
+      </section>
+
+    </div>
+  </body>
+</html>

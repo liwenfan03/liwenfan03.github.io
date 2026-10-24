@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# 专利证书：只留在本地，不上传
+data/patents/
+
+# 本地素材：网站没有用到
+images/projects/grasping/抓尾巴Robo视角.gif
+images/projects/grasping/TrackingSpeed2x.gif
+images/projects/curling/static-pic.heic
+images/projects/curling/motor-wiring.png
+images/projects/curling/push-sketch.png
+images/projects/curling/push-detail.png
+images/projects/curling/flywheel2-sketch.png
+images/projects/curling/flywheel2-diagram.png
+images/projects/curling/shove-sketch.png
+images/projects/curling/shove-dispenser.png
